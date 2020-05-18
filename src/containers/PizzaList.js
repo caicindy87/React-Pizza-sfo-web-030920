@@ -1,8 +1,31 @@
-import React, { Component } from 'react';
-import Pizza from '../components/Pizza'
+import React, { Component } from "react";
+import Pizza from "../components/Pizza";
 class PizzaList extends Component {
+  state = {
+    pizzas: [],
+  };
+
+  componentDidMount() {
+    fetch("http://localhost:3000/pizzas")
+      .then((resp) => resp.json())
+      .then((data) => this.setState({ pizzas: data }));
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps !== this.props) {
+      const changedPizzas = this.state.pizzas.map((pizza) =>
+        pizza.id === this.props.pizza.id ? this.props.pizza : pizza
+      );
+
+      this.setState({
+        pizzas: changedPizzas,
+      });
+    }
+  }
 
   render() {
+    const { pizzas } = this.state;
+
     return (
       <table className="table table-striped">
         <thead>
@@ -14,14 +37,17 @@ class PizzaList extends Component {
           </tr>
         </thead>
         <tbody>
-          {
-            //render Pizza here
-          }
+          {pizzas.map((pizza) => (
+            <Pizza
+              key={pizza.id}
+              pizza={pizza}
+              handleEditClick={this.props.handleEditClick}
+            />
+          ))}
         </tbody>
       </table>
     );
   }
-
 }
 
 export default PizzaList;
